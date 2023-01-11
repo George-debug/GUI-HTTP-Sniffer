@@ -1,6 +1,7 @@
 from sniffer.Sniffer import Sniffer
 from sniffer.packages.InternetProtocolPacket import InternetProtocolPacket
 from sniffer.packages.TransmissionControlProtocolPacket import TransmissionControlProtocolPacket
+from sniffer.packages.HypertextTransferProtocol import HypertextTransferProtocol
 
 
 destination_set = set()
@@ -19,10 +20,16 @@ def print_all(packet: InternetProtocolPacket):
 
 
 def piped(packet: InternetProtocolPacket):
-    print_all(packet)
-    if (TransmissionControlProtocolPacket.is_this_packet(packet)):
-        tcp_packet = TransmissionControlProtocolPacket(packet)
-        print(tcp_packet.destination_port, tcp_packet.source_port)
+    if not TransmissionControlProtocolPacket.is_this_packet(packet):
+        return
+    tcp_packet = TransmissionControlProtocolPacket(packet)
+
+    if not HypertextTransferProtocol.is_this_packet(tcp_packet):
+        return
+
+    http_packet = HypertextTransferProtocol(tcp_packet)
+
+    print("IS HTTP PACKET")
 
 
 s = Sniffer(piped)

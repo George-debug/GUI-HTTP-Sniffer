@@ -12,7 +12,6 @@ class TransmissionControlProtocolPacket:
         # B - unsigned char (1 byte)
         # H - unsigned short (2 bytes)
         # I - unsigned int (4 bytes)
-        print("length for tcp: ", len(self.ip_layer.data))
         self.source_port, \
             self.destination_port, \
             self.sequence_number, \
