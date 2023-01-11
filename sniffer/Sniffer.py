@@ -6,9 +6,8 @@ from typing import Callable
 
 
 class Sniffer:
-    def __init__(self, handle_packet: Callable[[InternetProtocolPacket], None], package_type=InternetProtocolPacket):
+    def __init__(self, handle_packet: Callable[[InternetProtocolPacket], None]):
         self._handle_packet = handle_packet
-        self._package_type = package_type
 
     def start(self):
         # https://docs.python.org/3/library/socket.html
@@ -32,5 +31,5 @@ class Sniffer:
             self.__handle_data(raw_data)
 
     def __handle_data(self, raw_data: bytes):
-        packet = self._package_type(raw_data)
+        packet = InternetProtocolPacket(raw_data)
         self._handle_packet(packet)

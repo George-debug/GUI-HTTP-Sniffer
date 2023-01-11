@@ -53,7 +53,7 @@ class InternetProtocolPacket:
 
         self.source_address = bytes_to_ip_address(source_address)
         self.destination_address = bytes_to_ip_address(destination_address)
-        self.ip_options = self.data[20:self.header_length * 4]
+
         # data is the rest of the packet
         self.data = self.data[self.header_length * 4:]
         # print("unpacked ip header")
