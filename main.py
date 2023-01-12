@@ -13,6 +13,12 @@ orderer = OrderHTTP(http_filter.add_packet)
 
 
 def on_packet(packet: InternetProtocolPacket):
+    """
+    It is called when a packet is captured. It checks if the packet is a HTTP packet and if it is, it adds it to the filter
+
+    Args:
+        packet (InternetProtocolPacket): The packet to be checked
+    """
     try:
         if TransmissionControlProtocolPacket.is_this_packet(packet):
             tcp_packet = TransmissionControlProtocolPacket(packet)
@@ -30,6 +36,13 @@ sniffer_thread.start()
 
 
 def clear_command(args: List[str]):
+    """
+    Command: clear
+    It clears the list of packets.
+
+    Args:
+        args (List[str]): The arguments of the command
+    """
     if len(args) != 0:
         print("Invalid arguments")
         return
@@ -37,6 +50,13 @@ def clear_command(args: List[str]):
 
 
 def next_command(args: List[str]):
+    """
+    Command: next
+    It returns the next packet in the list of packets
+
+    Args:
+        args (List[str]): The arguments of the command
+    """
     if len(args) != 0:
         print("Invalid arguments")
         return
@@ -48,6 +68,14 @@ def next_command(args: List[str]):
 
 
 def add_filter_command(args: List[str]):
+    """
+    Command: add_filter <<contains/equals>> <<key>> <<value>>
+    It adds a filter to the list of filters
+
+    Args:
+        args (List[str]): The arguments of the command
+    """
+
     contains_equal = args[0]
     args = args[1:]
 
@@ -66,6 +94,13 @@ def add_filter_command(args: List[str]):
 
 
 def exit_command(args: List[str]):
+    """
+    Command: exit
+    It stops the sniffer and exits the program
+
+    Args:
+        args (List[str]): The arguments of the command
+    """
     if len(args) != 0:
         print("Invalid arguments")
         return
@@ -76,6 +111,13 @@ def exit_command(args: List[str]):
 
 
 def remove_filters_command(args: List[str]):
+    """
+    Command: remove_filters
+    It removes all the filters
+
+    Args:
+        args (List[str]): The arguments of the command
+    """
     if len(args) != 0:
         print("Invalid arguments")
         return
@@ -83,7 +125,8 @@ def remove_filters_command(args: List[str]):
     http_filter.remove_filters()
 
 
-commands: Dict[str, Callable[[List[str]], None]] = {
+# Dict that contains all the commands
+COMMANDS: Dict[str, Callable[[List[str]], None]] = {
     "clear": clear_command,
     "next": next_command,
     "add_filter": add_filter_command,
@@ -94,7 +137,7 @@ commands: Dict[str, Callable[[List[str]], None]] = {
 while True:
     command = input("Enter command: ")
     command = command.split(" ")
-    if command[0] not in commands:
+    if command[0] not in COMMANDS:
         print("Invalid command")
         continue
-    commands[command[0]](command[1:])
+    COMMANDS[command[0]](command[1:])
