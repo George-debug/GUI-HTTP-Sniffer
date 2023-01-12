@@ -9,28 +9,22 @@ def toHex(data: bytes) -> str:
 class HypertextTransferProtocol:
 
     def unpack_http_header(self):
-        print(len(self.tcp_layer.data))
-        if len(self.tcp_layer.data) < 2:
-            return
-
-        print(toHex(self.tcp_layer.data))
         lines = self.tcp_layer.data.split(b'\r\n')
-        print("lines: ", lines)
         headers = {}
-        body = b''
-        header_end = False
-        for line in lines:
-            if not header_end:
-                if line:
-                    header, value = line.split(b':')
-                    headers[header.decode()] = value.decode().strip()
-                else:
-                    header_end = True
-            else:
-                body += line
 
-        print("headers: ", headers)
-        print("body: ", body)
+        headers["Method"], headers["Path"], headers["Version"] = lines[0].split(
+            b' ')
+
+        lines = lines[1:]
+
+        for line in lines:
+            if len(line) == 0:
+                break
+
+            key, value = line.split(b': ')
+            headers[key.decode()] = value.decode()
+
+        self.headers = headers
 
     def __init__(self, packet: TransmissionControlProtocolPacket) -> None:
         self.tcp_layer = packet
@@ -44,4 +38,6 @@ class HypertextTransferProtocol:
         #     return serv == "http"
         # except:
         #     return False
+        if len(packet.data) < 2:
+            return False
         return packet.source_port == 80 or packet.destination_port == 80

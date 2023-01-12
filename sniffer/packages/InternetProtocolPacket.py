@@ -2,6 +2,7 @@ import struct
 import socket
 import sys
 
+
 def bytes_to_ip_address(bytes_addr) -> str:
     bytes_str = map(str, bytes_addr)
     ip_addr = '.'.join(bytes_str)
@@ -17,24 +18,26 @@ class InternetProtocolPacket:
         # B - unsigned char (1 byte)
         # H - unsigned short (2 bytes)
         # I - unsigned int (4 bytes)
-        \
-        version_and_header_length, \
-            self.type_of_service, \
-            self.total_length, \
-            self.identification, \
-            flags_and_fragment_offset, \
-            self.time_to_live, \
-            self.ip_protocol, \
-            self.header_checksum, \
-            source_address, \
-            destination_address \
-            = struct.unpack("! B B H H H B B H 4s 4s", self.data[:20])
+
+        (version_and_header_length,
+            self.type_of_service,
+            self.total_length,
+            self.identification,
+            flags_and_fragment_offset,
+            self.time_to_live,
+            self.ip_protocol,
+            self.header_checksum,
+            source_address,
+            destination_address) = struct.unpack("! B B H H H B B H 4s 4s", self.data[:20])
 
         # print("this =>>", struct.unpack("! 20B", self.data[:20]))
 
         # version is first 4 bits of version_and_header_length
         # vvvvhhhh >> 4 = vvvv
         self.version = version_and_header_length >> 4
+
+        if self.version != 4:
+            raise Exception("Not IPv4 packet")
 
         # header length is last 4 bits of version_and_header_length
         # vvvvhhhh & 00001111 = hhhh

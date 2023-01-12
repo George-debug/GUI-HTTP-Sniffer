@@ -20,6 +20,7 @@ def print_all(packet: InternetProtocolPacket):
 
 
 def piped(packet: InternetProtocolPacket):
+    print_all(packet)
     if not TransmissionControlProtocolPacket.is_this_packet(packet):
         return
     tcp_packet = TransmissionControlProtocolPacket(packet)
@@ -29,7 +30,8 @@ def piped(packet: InternetProtocolPacket):
 
     http_packet = HypertextTransferProtocol(tcp_packet)
 
-    print("IS HTTP PACKET")
+    for key, value in http_packet.headers.items():
+        print(key, ":", value)
 
 
 s = Sniffer(piped)
