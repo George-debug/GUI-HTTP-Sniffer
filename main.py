@@ -44,7 +44,7 @@ def next_command(args: List[str]):
     if request is None:
         print("No more requests")
         return
-    print(request.headers)
+    print(request)
 
 
 def add_filter_command(args: List[str]):
@@ -57,8 +57,10 @@ def add_filter_command(args: List[str]):
 
     if contains_equal == "contains":
         http_filter.add_contains_filter(args[0], args[1])
-    elif contains_equal == "equal":
-        http_filter.add_equal_filter(args[0], args[1])
+    elif contains_equal == "equals":
+        http_filter.add_equals_filter(args[0], args[1])
+
+    http_filter.clear()
 
     print("Filter added")
 
@@ -68,14 +70,25 @@ def exit_command(args: List[str]):
         print("Invalid arguments")
         return
 
+    s.stop()
+    sniffer_thread.join()
     exit(0)
+
+
+def remove_filters_command(args: List[str]):
+    if len(args) != 0:
+        print("Invalid arguments")
+        return
+
+    http_filter.remove_filters()
 
 
 commands: Dict[str, Callable[[List[str]], None]] = {
     "clear": clear_command,
     "next": next_command,
     "add_filter": add_filter_command,
-    "exit": exit_command
+    "exit": exit_command,
+    "remove_filters": remove_filters_command
 }
 
 while True:

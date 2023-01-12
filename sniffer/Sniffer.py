@@ -9,6 +9,7 @@ import struct
 class Sniffer:
     def __init__(self, handle_packet: Callable[[InternetProtocolPacket], None]):
         self._handle_packet = handle_packet
+        self.__is_running = False
 
     # =============== windows attempt
     # def start(self):
@@ -34,6 +35,7 @@ class Sniffer:
     #         self.__handle_data(raw_data)
 
     def start(self):
+        self.__is_running = True
         # https://docs.python.org/3/library/socket.html
         # for linux:
         # create a raw socket and bind it to the public interface
@@ -42,7 +44,7 @@ class Sniffer:
 
         conn.bind(("eth0", 0))
 
-        while True:
+        while self.__is_running:
             raw_data, addr = conn.recvfrom(65535)
             self.__handle_data(raw_data)
 
@@ -53,3 +55,6 @@ class Sniffer:
             self._handle_packet(packet)
         except:
             pass
+
+    def stop(self):
+        self.__is_running = False
