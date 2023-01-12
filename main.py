@@ -5,7 +5,8 @@ from sniffer.packages.HypertextTransferProtocol import HypertextTransferProtocol
 from OrderHTTP import OrderHTTP
 
 
-def print_data(data):
+def print_data(data: bytes):
+    print(len(data))
     if data is None:
         return
     converted_utf = data.decode("utf-8", errors="ignore")
