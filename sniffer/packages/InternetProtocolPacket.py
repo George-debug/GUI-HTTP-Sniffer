@@ -102,3 +102,19 @@ class InternetProtocolPacket:
         self.data = data
 
         self.__unpack_ip_header()
+
+    @classmethod
+    def is_this_packet(cls, data: bytes):
+        """
+        It checks if the data is an IP packet
+
+        Args:
+            data (bytes): The data representing ethernet frame
+
+        Returns:
+            bool: True if the data is an IP packet, False otherwise
+        """
+
+        ethernet_type = struct.unpack("! H", data[12:14])[0]
+
+        return ethernet_type == 0x0800

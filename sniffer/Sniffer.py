@@ -1,5 +1,6 @@
 import socket
 from sniffer.packages.InternetProtocolPacket import InternetProtocolPacket
+from sniffer.packages.AddressResolutionProtocolPacket import AddressResolutionProtocolPacket
 from typing import Callable
 
 
@@ -43,6 +44,14 @@ class Sniffer:
             return
 
         try:
+            # TODO: Create Ethernet Protocol
+            if AddressResolutionProtocolPacket.is_this_packet(raw_data):
+                print("ARP")
+                packet = AddressResolutionProtocolPacket(raw_data[14:])
+                print(packet)
+                return
+            if not InternetProtocolPacket.is_this_packet(raw_data):
+                return
             packet = InternetProtocolPacket(raw_data[14:])
 
             self._handle_packet(packet)

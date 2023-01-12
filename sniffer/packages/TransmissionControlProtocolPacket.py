@@ -76,3 +76,8 @@ class TransmissionControlProtocolPacket:
             bool: True if the IP packet is a TCP packet, False otherwise
         """
         return packet.ip_protocol == 6
+
+    def __str__(self):
+        return f"TCP {self.ip_layer.source_address}:{self.source_port} -> {self.ip_layer.destination_address}:{self.source_port} | data_length: {len(self.data)}"
+
+    __repr__ = __str__
