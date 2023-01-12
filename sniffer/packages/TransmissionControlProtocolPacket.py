@@ -12,16 +12,16 @@ class TransmissionControlProtocolPacket:
         # B - unsigned char (1 byte)
         # H - unsigned short (2 bytes)
         # I - unsigned int (4 bytes)
-        self.source_port, \
-            self.destination_port, \
-            self.sequence_number, \
-            self.acknowledgement_number, \
-            data_offset_reserved, \
-            self.flags, \
-            self.window_size, \
-            self.checksum, \
-            self.urgent_pointer = struct.unpack(
-                "! H H I I B B H H H", self.ip_layer.data[:20])
+        (self.source_port,
+         self.destination_port,
+         self.sequence_number,
+         self.acknowledgement_number,
+         data_offset_reserved,
+         self.flags,
+         self.window_size,
+         self.checksum,
+         self.urgent_pointer) = struct.unpack(
+            "! H H I I B B H H H", self.ip_layer.data[:20])
 
         # take first half
         self.data_offset = data_offset_reserved >> 4
