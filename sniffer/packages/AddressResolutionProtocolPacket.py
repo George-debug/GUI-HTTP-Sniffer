@@ -50,7 +50,9 @@ class AddressResolutionProtocolPacket:
         Returns:
             bool: True if the packet is an ARP packet, False otherwise
         """
-        return packet[12:14] == 0x0806
+
+        ethernet_type = struct.unpack("! H", packet[12:14])[0]
+        return ethernet_type == 0x0806
 
     def __str__(self):
         return f"ARP: {self.sender_hardware_address} -> {self.target_hardware_address} | data_length: {len(self.data)}"
