@@ -5,7 +5,7 @@ from sniffer.packages.HypertextTransferProtocol import HypertextTransferProtocol
 from OrderHTTP import OrderHTTP
 from FilterHTTP import FilterHTTP
 import threading
-from typing import Dict, List, Tuple, Callable
+from typing import Dict, List, Callable
 
 http_filter = FilterHTTP()
 

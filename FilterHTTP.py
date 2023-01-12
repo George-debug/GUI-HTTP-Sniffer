@@ -1,21 +1,38 @@
-import threading
-from datetime import datetime
 from typing import Callable
 from typing import List
 
-ignored_headers = ["Method", "Path", "Version"]
+
+IGNORED_HEADERS = ["Method", "Path", "Version"]
 
 
 class HTTPPRequest:
-    def __init__(self, bytes):
+    """
+    This class represents a HTTP request
+
+    Attributes:
+        headers (Dict[str, str]): A dictionary containing the headers of the request. Also, it contains the method, path and version of the request.
+        body (bytes): The body of the request
+    """
+
+    def __init__(self, pr_bytes: bytes) -> None:
+        """
+        It converts TCP payload data into a HTTP request
+
+        Args:
+            bytes (bytes): The TCP payload data
+
+        Raises:
+            Exception: If the TCP payload data is not a valid HTTP request
+        """
+
         headers = {}
-        lines = bytes.split(b'\r\n')
+        lines = pr_bytes.split(b'\r\n')
 
         title = lines[0].split(b' ')
 
         if len(title) != 3:
             raise Exception("Invalid HTTP request")
-        # print("good")
+
         method, path, version = title
 
         if method not in [b"GET", b"POST", b"PUT", b"DELETE"]:
@@ -37,12 +54,28 @@ class HTTPPRequest:
         self.headers = headers
 
     def __str__(self) -> str:
+        """
+        It returns a string representation of the HTTP request
+
+        Blueprint:
+            Method:
+            Path:
+            Version:
+
+            <<headers>>
+
+            Body:
+            <<body>>
+
+        Returns:
+            str: The string representation of the HTTP request
+        """
         rv = f"Method: {self.headers['Method']}\r\n"
         rv += f"Path: {self.headers['Path']}\r\n"
         rv += f"Version: {self.headers['Version']}\r\n\r\n"
 
         for key in self.headers:
-            if key in ignored_headers:
+            if key in IGNORED_HEADERS:
                 continue
             rv += f"{key}: {self.headers[key]}\r\n"
 
@@ -52,51 +85,78 @@ class HTTPPRequest:
         return rv
 
     def __repr__(self) -> str:
+        """
+        __repr__ = __str__
+        """
         return self.__str__()
-
-
-def get_current_time() -> int:
-    curr_dt = datetime.now()
-    return int(round(curr_dt.timestamp()))
 
 
 class FilterHTTP:
     def __init__(self):
         self.__packets: List[HTTPPRequest] = []
         self.__filters: List[Callable[[HTTPPRequest], bool]] = []
-        # self.__lock = threading.Lock()
 
-    def add_packet(self, packet: bytes):
-        # print("adding packet")
+    def add_packet(self, packet: bytes) -> None:
+        """
+        It adds a packet to the list of packets ONLY if it passes all the filters
+
+        Args:
+            packet (bytes): The packet to add
+        """
         try:
             request = HTTPPRequest(packet)
             for filter in self.__filters:
                 if not filter(request):
                     return
             self.__packets.append(request)
-        except Exception as e:
-            # print("Error: " + str(e))
+        except:
             pass
 
     def clear(self):
+        """
+        It clears the list of packets
+        """
         self.__packets.clear()
 
     def remove_filters(self):
+        """
+        It removes all the filters
+        """
         self.__filters.clear()
 
-    def next(self) -> HTTPPRequest:
+    def next(self) -> HTTPPRequest or None:
+        """
+        It returns the next packet in the list of packets
+
+        Returns:
+            HTTPPRequest or None: The next packet in the list of packets
+        """
         if len(self.__packets) == 0:
             return None
 
         return self.__packets.pop(0)
 
-    def add_contains_filter(self, key: str, value: str):
+    def add_contains_filter(self, key: str, value: str) -> None:
+        """
+        It adds the filter: Header key must contain the value
+
+        Args:
+            key (str): The header key
+            value (str): The value to search
+        """
         def filter(request: HTTPPRequest) -> bool:
             return key in request.headers and value in request.headers[key]
 
         self.__filters.append(filter)
 
-    def add_equals_filter(self, key: str, value: str):
+    def add_equals_filter(self, key: str, value: str) -> None:
+        """
+        It adds the filter: Header key must be equal to the value
+
+        Args:
+            key (str): The header key
+            value (str): The value to search
+        """
         def filter(request: HTTPPRequest) -> bool:
             return key in request.headers and request.headers[key] == value
 
