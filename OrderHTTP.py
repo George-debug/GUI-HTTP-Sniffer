@@ -97,7 +97,7 @@ def merge_packages(packets: List[HypertextTransferProtocol]) -> bytes:
 
 
 class OrderHTTP:
-    def __init__(self, callback: Callable[[HypertextTransferProtocol], None]) -> None:
+    def __init__(self, callback: Callable[[bytes], None]) -> None:
         self.packets: Dict[SessionInfo, List[HypertextTransferProtocol]] = {}
         self.__callback = callback
 

@@ -47,6 +47,9 @@ class Sniffer:
             self.__handle_data(raw_data)
 
     def __handle_data(self, raw_data: bytes):
-        packet = InternetProtocolPacket(raw_data[14:])
+        try:
+            packet = InternetProtocolPacket(raw_data[14:])
 
-        self._handle_packet(packet)
+            self._handle_packet(packet)
+        except:
+            pass
