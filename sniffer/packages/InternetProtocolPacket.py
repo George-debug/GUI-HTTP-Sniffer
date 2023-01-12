@@ -1,18 +1,49 @@
 import struct
-import socket
-import sys
 
 
 def bytes_to_ip_address(bytes_addr) -> str:
+    """
+    Converts bytes to ip address string
+
+    Args:
+        bytes_addr (bytes): The bytes to be converted
+
+    Returns:
+        str: The bytes converted to ip address string
+    """
     bytes_str = map(str, bytes_addr)
     ip_addr = '.'.join(bytes_str)
     return ip_addr
 
 
 class InternetProtocolPacket:
-    def __unpack_ip_header(self):
-        # print("unpacking ip header")
+    """
+        Unpacks the raw data of the IP header, and stores the data in the attributes.
 
+        Attributes:
+            data (bytes): The raw data of the remaining packet
+            version (int): The version of the IP header
+            header_length (int): The length of the IP header
+            type_of_service (int): The type of service of the IP header
+            total_length (int): The total length of the IP header
+            identification (int): The identification of the IP header
+            flags (int): The flags of the IP header
+            fragment_offset (int): The fragment offset of the IP header
+            time_to_live (int): The time to live of the IP header
+            ip_protocol (int): The ip protocol of the IP header
+            header_checksum (int): The header checksum of the IP header
+            source_address (str): The source address of the IP header
+            destination_address (str): The destination address of the IP header
+            unhandled_ip_header (bytes): The unhandled data of the IP header
+    """
+
+    def __unpack_ip_header(self):
+        """
+        It unpacks the raw data of the IP header, and stores the data in the attributes.
+
+        Raises:
+            Exception: If the version of the IP header is not 4
+        """
         # unpack IP header
 
         # B - unsigned char (1 byte)
@@ -29,8 +60,6 @@ class InternetProtocolPacket:
             self.header_checksum,
             source_address,
             destination_address) = struct.unpack("! B B H H H B B H 4s 4s", self.data[:20])
-
-        # print("this =>>", struct.unpack("! 20B", self.data[:20]))
 
         # version is first 4 bits of version_and_header_length
         # vvvvhhhh >> 4 = vvvv
@@ -59,11 +88,17 @@ class InternetProtocolPacket:
 
         # data is the rest of the packet
         self.data = self.data[self.header_length * 4:]
-        # print("unpacked ip header")
 
     def __init__(self, data: bytes):
+        """
+        It unpacks the raw data of the IP header, and stores the data in the attributes.
+
+        Args:
+            data (bytes): The raw data of the remaining packet
+
+        Raises:
+            Exception: If the version of the IP header is not 4
+        """
         self.data = data
-        # print("length after ", len(self.data))
 
         self.__unpack_ip_header()
-        # print("length after x2 ", len(self.data))

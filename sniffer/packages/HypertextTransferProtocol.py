@@ -1,50 +1,54 @@
 from sniffer.packages.TransmissionControlProtocolPacket import TransmissionControlProtocolPacket
-import socket
 
 
 def toHex(data: bytes) -> str:
+    """
+    Converts bytes to hex
+
+    It was used for testing
+
+    Args:
+        data (bytes): The data to be converted
+
+    Returns:
+        str: The data converted to hex
+    """
     return ' '.join([hex(x) for x in data])
 
 
 class HypertextTransferProtocol:
 
-    # def unpack_http_header(self):
-    #     print(toHex(self.tcp_layer.data))
-    #     lines = self.tcp_layer.data.split(b'\r\n')
-    #     headers = {}
+    """
+    It converts a Transmission Control Protocol Packet into a Hyper Text Transfer Protocol Packet
 
-    #     # headers["Method"], headers["Path"], headers["Version"] = lines[0].split(
-    #     #     b' ')
-    #     headers["title"] = lines[0]
+    It can check if the TCO packet is a HTTP packet
 
-    #     lines = lines[1:]
-
-    #     for line in lines:
-    #         if len(line) == 0:
-    #             break
-
-    #         key, value = line.split(b': ')
-    #         headers[key.decode()] = value.decode()
-
-    #     self.headers = headers
+    Attributes:
+        tcp_layer (TransmissionControlProtocolPacket): The TCP packet
+        data (bytes): The unhandled data of the HTTP packet
+    """
 
     def __init__(self, packet: TransmissionControlProtocolPacket) -> None:
+        """
+        It converts a Transmission Control Protocol Packet into a Hyper Text Transfer Protocol Packet
+
+        Args:
+            packet (TransmissionControlProtocolPacket): The TCP packet
+        """
         self.tcp_layer = packet
 
         self.data = self.tcp_layer.data
         self.tcp_layer.data = None
 
-        # self.unpack_http_header()
-
     @ classmethod
     def is_this_packet(cls, packet: TransmissionControlProtocolPacket) -> bool:
-        # try:
-        #     serv = socket.getservbyport(port, "tcp")
-        #     return serv == "http"
-        # except:
-        #     return False
+        """
+        Checks if the TCP packet is a HTTP packet
 
-        # if all_bytes_are_null(packet.data):
-        #     return False
+        Args:
+            packet (TransmissionControlProtocolPacket): The TCP packet
 
+        Returns:
+            bool: True if the TCP packet is a HTTP packet, False otherwise
+        """
         return packet.source_port == 80 or packet.destination_port == 80
