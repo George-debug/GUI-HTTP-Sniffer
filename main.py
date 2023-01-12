@@ -2,40 +2,26 @@ from sniffer.Sniffer import Sniffer
 from sniffer.packages.InternetProtocolPacket import InternetProtocolPacket
 from sniffer.packages.TransmissionControlProtocolPacket import TransmissionControlProtocolPacket
 from sniffer.packages.HypertextTransferProtocol import HypertextTransferProtocol
+from OrderHTTP import OrderHTTP
 
 
-destination_set = set()
-
-
-def print_destination(packet: InternetProtocolPacket):
-    if packet.destination_address not in destination_set:
-        destination_set.add(packet.destination_address)
-        print(packet.destination_address)
-
-
-def print_all(packet: InternetProtocolPacket):
-    print("===============================================")
-    print(packet.source_address, " -> ",
-          packet.destination_address, packet.ip_protocol)
-
-
-def piped(packet: InternetProtocolPacket):
-
-    if not TransmissionControlProtocolPacket.is_this_packet(packet):
+def print_data(data):
+    if data is None:
         return
-    tcp_packet = TransmissionControlProtocolPacket(packet)
-
-    if not HypertextTransferProtocol.is_this_packet(tcp_packet):
-        return
-
-    print_all(packet)
-
-    http_packet = HypertextTransferProtocol(tcp_packet)
-
-    data = http_packet.data
-
-    print(data.decode("utf-8", errors="ignore"))
+    converted_utf = data.decode("utf-8", errors="ignore")
+    print(converted_utf)
 
 
-s = Sniffer(piped)
+orderer = OrderHTTP(print_data)
+
+
+def on_packet(packet: InternetProtocolPacket):
+    if TransmissionControlProtocolPacket.is_this_packet(packet):
+        tcp_packet = TransmissionControlProtocolPacket(packet)
+        if HypertextTransferProtocol.is_this_packet(tcp_packet):
+            http_packet = HypertextTransferProtocol(tcp_packet)
+            orderer(http_packet)
+
+
+s = Sniffer(on_packet)
 s.start()

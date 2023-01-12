@@ -6,13 +6,6 @@ def toHex(data: bytes) -> str:
     return ' '.join([hex(x) for x in data])
 
 
-def all_bytes_are_null(data: bytes) -> bool:
-    for byte in data:
-        if byte != 0:
-            return False
-    return True
-
-
 class HypertextTransferProtocol:
 
     # def unpack_http_header(self):
